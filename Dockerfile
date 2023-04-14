@@ -12,9 +12,10 @@ RUN npm ci
 
 # compile typescript
 COPY src/ ./src/
-COPY tsconfig.json .
+COPY tsconfig.json ./
+COPY schema.graphql ./
 RUN npm run compile
 
 # final configs
-EXPOSE 4000
-CMD [ "sh", "-c", "npm run start:${NODE_ENV}" ]
+EXPOSE 3000
+CMD [ "sh", "-c", "npm run start:prod" ]

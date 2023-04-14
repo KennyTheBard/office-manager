@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  office_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: office_api
+    restart: always
+    # depends_on:
+    #   - office_db
+    environment:
+      PG_HOST: office_db
+      PG_PORT: 5432
+      PG_USER: ${PG_USER}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_DATABASE: ${PG_DATABASE}
+    ports:
+      - "3000:3000"
+    networks:
+      - office_net
+  office_db:
+    image: postgres
+    container_name: office_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+      TZ: Europe/Bucharest
+      PGTZ: Europe/Bucharest
+    ports:
+      - ${PG_PORT}:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./migrations/_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - office_net
+
+
+networks:
+  office_net:
+    driver: bridge

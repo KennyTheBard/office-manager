@@ -3,7 +3,6 @@ import { Booking } from './Booking';
 import { Employee } from './Employee';
 import { Room } from './Room';
 
-import './associations';
+import * as associations from './associations';
 
-export * from './associations';
-export { sequelize, Employee, Room, Booking };
+export { sequelize, Employee, Room, Booking, associations };
