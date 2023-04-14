@@ -1,0 +1,30 @@
+{
+  "name": "core",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "compile:watch": "tsc -w",
+    "start:local": "nodemon -r dotenv/config build/src/index.js dotenv_config_path=.env"
+  },
+  "engines": {
+    "node": ">=10.4.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/node": "^14.18.36",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
+    "typescript": "~4.9.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "tslib": "1.11.2",
+    "type-graphql": "^1.1.1",
+    "winston": "^3.8.2",
+    "zod": "^3.20.6"
+  }
+}
