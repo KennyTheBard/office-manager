@@ -1,9 +1,9 @@
-import { Op } from 'sequelize';
-import { BookingService } from '.';
-import { Employee, Room } from '../models';
+import {Op} from 'sequelize';
+import {BookingService} from '.';
+import {Employee, Room} from '../models';
 
 export class RoomService {
-    constructor(private readonly bookingService: BookingService) { }
+    constructor(private readonly bookingService: BookingService) {}
 
     public getAvailableRooms = async (
         startTime: Date,
@@ -74,7 +74,7 @@ export class RoomService {
         if (room.openingHours > RoomService.getMinutesFromMidnight(startTime)) {
             const openingHours = RoomService.getDateFromMinutesFromMidnight(
                 startTime,
-                room.openingHours,
+                room.openingHours
             );
             slots.push({
                 type: 'closed',
@@ -134,10 +134,11 @@ export class RoomService {
 
         return {
             slots: slots
-                .filter(slot => slot.endTime.getTime() - slot.startTime.getTime() > 1)
-                .sort(
-                    (a, b) => a.startTime.getTime() - b.startTime.getTime()
-                ),
+                .filter(
+                    slot =>
+                        slot.endTime.getTime() - slot.startTime.getTime() > 1
+                )
+                .sort((a, b) => a.startTime.getTime() - b.startTime.getTime()),
         };
     };
 

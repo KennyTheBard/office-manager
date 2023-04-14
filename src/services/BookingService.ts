@@ -1,7 +1,7 @@
-import { Op, Transaction } from 'sequelize';
-import { Booking, Room, sequelize } from '../models';
-import { BookingToRoom } from '../models/associations';
-import { RoomService } from '.';
+import {Op, Transaction} from 'sequelize';
+import {Booking, Room, sequelize} from '../models';
+import {BookingToRoom} from '../models/associations';
+import {RoomService} from '.';
 
 export class BookingService {
     public getSortedBookingsInInterval = async (
@@ -61,8 +61,11 @@ export class BookingService {
                 if (!room) {
                     throw new Error(`Could not find room ${roomId}`);
                 }
-                if (RoomService.getMinutesFromMidnight(startTime) < room.openingHours
-                    || RoomService.getMinutesFromMidnight(endTime) > room.closingHours
+                if (
+                    RoomService.getMinutesFromMidnight(startTime) <
+                        room.openingHours ||
+                    RoomService.getMinutesFromMidnight(endTime) >
+                        room.closingHours
                 ) {
                     throw new Error('Slot outside of open hours');
                 }
