@@ -1,12 +1,16 @@
 import {Sequelize} from 'sequelize';
 import { config } from '../config';
 
-export const sequelize = new Sequelize({
+const sequelize = new Sequelize({
     dialect: 'postgres',
     ...config.pg,
 });
 
-export * from './Employee';
-export * from './Room';
-export * from './Booking';
-export * from './sync';
+import { Booking } from './Booking';
+import { Employee } from './Employee';
+import { Room } from './Room';
+
+import './associations';
+
+export * from './associations';
+export { sequelize, Employee, Room, Booking };

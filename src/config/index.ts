@@ -5,11 +5,11 @@ dotenv.config();
 export const config: Config = {
     port: parseInt(process.env.PORT ?? '3000'),
     pg: {
-        host: process.env.PGHOST!,
-        port: parseInt(process.env.PGPORT!),
-        database: process.env.PGDATABASE!,
-        username: process.env.PGUSER!,
-        password: process.env.PGPASSWORD!,
+        host: process.env.PG_HOST!,
+        port: parseInt(process.env.PG_PORT!),
+        database: process.env.PG_DATABASE!,
+        username: process.env.PG_USER!,
+        password: process.env.PG_PASSWORD!,
     },
 };
 

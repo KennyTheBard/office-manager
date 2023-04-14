@@ -8,7 +8,6 @@ import {
     DataTypes,
     HasManySetAssociationsMixin,
     NonAttribute,
-    HasManyAddAssociationsMixin,
 } from 'sequelize';
 import {Booking, sequelize} from '.';
 
