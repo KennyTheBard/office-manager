@@ -1,0 +1,27 @@
+name: Lint check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run GTS lint checks
+        run: npm run lint
+
+      - name: Check for GTS lint errors
+        run: |
+          if grep -q 'error' ./output.txt; then
+            echo "GTS lint failed. Please fix the errors and try again."
+            exit 1
+          fi
