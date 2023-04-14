@@ -1,5 +1,15 @@
-import { Model, InferAttributes, InferCreationAttributes, CreationOptional, NonAttribute, HasManyGetAssociationsMixin, HasOneSetAssociationMixin, Association, HasManySetAssociationsMixin, DataTypes } from "sequelize";
-import { Booking, sequelize } from ".";
+import {
+    Model,
+    InferAttributes,
+    InferCreationAttributes,
+    CreationOptional,
+    NonAttribute,
+    HasManyGetAssociationsMixin,
+    Association,
+    HasManySetAssociationsMixin,
+    DataTypes,
+} from 'sequelize';
+import {Booking, sequelize} from '.';
 
 export class Room extends Model<
     InferAttributes<Room>,

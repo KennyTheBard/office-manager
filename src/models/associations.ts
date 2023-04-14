@@ -1,4 +1,4 @@
-import { Booking, Employee, Room } from ".";
+import {Booking, Employee, Room} from '.';
 
 /**
  * Establish associations between models before they are synced.

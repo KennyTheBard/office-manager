@@ -1,7 +1,14 @@
-
-
-import { Resolver, Query, Arg, Mutation, Field, ID, ObjectType } from 'type-graphql';
-import { Employee } from '../models';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+    Resolver,
+    Query,
+    Arg,
+    Mutation,
+    Field,
+    ID,
+    ObjectType,
+} from 'type-graphql';
+import {Employee} from '../models';
 
 @ObjectType()
 export class EmployeeOutput {
@@ -14,7 +21,7 @@ export class EmployeeOutput {
 
 @Resolver(Employee)
 export class EmployeeResolver {
-    @Query(() => EmployeeOutput, { nullable: true })
+    @Query(() => EmployeeOutput, {nullable: true})
     async employee(@Arg('id') id: number): Promise<EmployeeOutput | null> {
         return await Employee.findByPk(id);
     }
@@ -26,7 +33,7 @@ export class EmployeeResolver {
 
     @Mutation(() => EmployeeOutput)
     async createEmployee(@Arg('email') email: string): Promise<EmployeeOutput> {
-        const employee = await Employee.create({ email });
+        const employee = await Employee.create({email});
         await employee.save();
         return employee;
     }

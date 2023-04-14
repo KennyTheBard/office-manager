@@ -1,7 +1,15 @@
-import { Arg, Ctx, Field, ID, Mutation, ObjectType, Query, Resolver } from "type-graphql";
-import { Booking, Employee, Room } from "../models";
-import { AppContext, EmployeeOutput, RoomOutput } from ".";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+    Arg,
+    Ctx,
+    Field,
+    ID,
+    Mutation,
+    ObjectType,
+    Resolver,
+} from 'type-graphql';
+import {Booking} from '../models';
+import {AppContext, EmployeeOutput, RoomOutput} from '.';
 
 @ObjectType()
 export class BookingOutput {
@@ -14,7 +22,7 @@ export class BookingOutput {
     @Field()
     endTime!: Date;
 
-    @Field(() => EmployeeOutput, { nullable: true })
+    @Field(() => EmployeeOutput, {nullable: true})
     employee!: EmployeeOutput;
 
     @Field(() => RoomOutput)
@@ -26,17 +34,23 @@ export class BookingOutput {
 
 @Resolver()
 export class BookingResolver {
-
     @Mutation(() => BookingOutput)
     async createBooking(
         @Arg('startTime') startTime: Date,
         @Arg('endTime') endTime: Date,
         @Arg('employeeId') employeeId: number,
         @Arg('roomId') roomId: number,
-        @Ctx() { bookingService }: AppContext,
+        @Ctx() {bookingService}: AppContext
     ): Promise<BookingOutput | null> {
-        // TODO: return error
-        return await bookingService.createBooking(employeeId, roomId, startTime, endTime) ?? null;
+        // could return error
+        return (
+            (await bookingService.createBooking(
+                employeeId,
+                roomId,
+                startTime,
+                endTime
+            )) ?? null
+        );
     }
 
     @Mutation(() => BookingOutput)
@@ -51,5 +65,4 @@ export class BookingResolver {
 
         return booking;
     }
-
 }

@@ -1,7 +1,16 @@
-import { ObjectType, Field, ID, Arg, Mutation, Query, Resolver, Ctx } from "type-graphql";
-import { Room } from "../models";
-import { AppContext, EmployeeOutput } from ".";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+    ObjectType,
+    Field,
+    ID,
+    Arg,
+    Mutation,
+    Query,
+    Resolver,
+    Ctx,
+} from 'type-graphql';
+import {Room} from '../models';
+import {AppContext, EmployeeOutput} from '.';
 
 @ObjectType()
 export class RoomOutput {
@@ -20,7 +29,6 @@ export class RoomOutput {
 
 @ObjectType()
 export class RoomSlotFreeOutput {
-
     @Field()
     type!: 'free';
 
@@ -33,7 +41,6 @@ export class RoomSlotFreeOutput {
 
 @ObjectType()
 export class RoomSlotClosedOutput {
-
     @Field()
     type!: 'closed';
 
@@ -46,11 +53,10 @@ export class RoomSlotClosedOutput {
 
 @ObjectType()
 export class RoomSlotBookedOutput {
-
     @Field()
     type!: 'booked';
 
-    @Field()
+    @Field(() => EmployeeOutput)
     employee!: EmployeeOutput;
 
     @Field()
@@ -62,8 +68,16 @@ export class RoomSlotBookedOutput {
 
 @ObjectType()
 export class RoomScheduleOutput {
-    @Field(() => [RoomSlotFreeOutput, RoomSlotClosedOutput, RoomSlotBookedOutput])
-    slots!: (RoomSlotFreeOutput | RoomSlotClosedOutput | RoomSlotBookedOutput)[];
+    @Field(() => [
+        RoomSlotFreeOutput,
+        RoomSlotClosedOutput,
+        RoomSlotBookedOutput,
+    ])
+    slots!: (
+        | RoomSlotFreeOutput
+        | RoomSlotClosedOutput
+        | RoomSlotBookedOutput
+    )[];
 }
 
 @Resolver(Room)
@@ -86,7 +100,7 @@ export class RoomResolver {
     async createRoom(
         @Arg('name') name: string,
         @Arg('openingHours') openingHours: number,
-        @Arg('closingHours') closingHours: number,
+        @Arg('closingHours') closingHours: number
     ): Promise<RoomOutput> {
         const room = await Room.create({
             name,
@@ -97,13 +111,12 @@ export class RoomResolver {
         return room;
     }
 
-
     @Query(() => RoomScheduleOutput)
     async roomSchedule(
         @Arg('roomId') roomId: number,
         @Arg('startTime') startTime: Date,
         @Arg('endTime') endTime: Date,
-        @Ctx() { roomService }: AppContext,
+        @Ctx() {roomService}: AppContext
     ): Promise<RoomScheduleOutput> {
         return await roomService.getRoomSchedule(roomId, startTime, endTime);
     }
@@ -112,7 +125,7 @@ export class RoomResolver {
     async availableRooms(
         @Arg('startTime') startTime: Date,
         @Arg('endTime') endTime: Date,
-        @Ctx() { roomService }: AppContext,
+        @Ctx() {roomService}: AppContext
     ): Promise<RoomOutput[]> {
         return await roomService.getAvailableRooms(startTime, endTime);
     }

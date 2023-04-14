@@ -1,5 +1,15 @@
-import { Association, CreationOptional, DataTypes, HasManyGetAssociationsMixin, HasManySetAssociationsMixin, HasOneSetAssociationMixin, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
-import { Employee, Room, sequelize } from ".";
+import {
+    Association,
+    CreationOptional,
+    DataTypes,
+    HasManyGetAssociationsMixin,
+    HasOneSetAssociationMixin,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute,
+} from 'sequelize';
+import {Employee, Room, sequelize} from '.';
 
 export class Booking extends Model<
     InferAttributes<Booking>,
@@ -39,11 +49,11 @@ export const BookingModel = Booking.init(
             type: DataTypes.DATE,
             allowNull: false,
         },
-        endTime:  {
+        endTime: {
             type: DataTypes.DATE,
             allowNull: false,
         },
-        cancelled:  {
+        cancelled: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
         },

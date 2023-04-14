@@ -1,28 +1,39 @@
-import { Op } from "sequelize";
-import { BookingService } from ".";
-import { Employee, Room, RoomToBooking } from "../models";
-
+import { Op } from 'sequelize';
+import { BookingService } from '.';
+import { Employee, Room } from '../models';
 
 export class RoomService {
+    constructor(private readonly bookingService: BookingService) { }
 
-    constructor(
-        private readonly bookingService: BookingService,
-    ) { }
+    public getAvailableRooms = async (
+        startTime: Date,
+        endTime: Date
+    ): Promise<Room[]> => {
+        // verify assumptions
+        if (startTime.getTime() > endTime.getTime()) {
+            throw new Error('Time interval incorrectly defined');
+        }
+        if (!RoomService.isSameDay(startTime, endTime)) {
+            throw new Error('Time interval must be defined on a single day');
+        }
 
-    // Assumption: startTime and endTime are in the same date
-    // TODO: validate this ^
-    public getAvailableRooms = async (startTime: Date, endTime: Date): Promise<Room[]> => {
+        // find out which rooms are open during the interval
         const openedRooms = await Room.findAll({
             where: {
                 openingHours: {
-                    [Op.lte]: this.getMinutesFromMidnight(startTime)
+                    [Op.lte]: RoomService.getMinutesFromMidnight(startTime),
                 },
                 closingHours: {
-                    [Op.gte]: this.getMinutesFromMidnight(endTime)
+                    [Op.gte]: RoomService.getMinutesFromMidnight(endTime),
                 },
-            }
+            },
         });
-        const bookings = await this.bookingService.getBookingsInInterval(startTime, endTime);
+
+        // find out which rooms have bookings overlapped with the interval
+        const bookings = await this.bookingService.getBookingsInInterval(
+            startTime,
+            endTime
+        );
         const bookedRooms = bookings.map(booking => booking.room.id);
 
         const availableRooms: Room[] = [];
@@ -33,33 +44,54 @@ export class RoomService {
         }
 
         return availableRooms;
-    }
+    };
 
-    // assume that startTime and endTime are durning the same day
-    // TODO: enforce this ^
-    public getRoomSchedule = async (roomId: number, startTime: Date, endTime: Date): Promise<RoomSchedule> => {
-        let slots: RoomSlot[] = [];
+    public getRoomSchedule = async (
+        roomId: number,
+        startTime: Date,
+        endTime: Date
+    ): Promise<RoomSchedule> => {
+        // verify assumptions
+        if (startTime.getTime() > endTime.getTime()) {
+            throw new Error('Time interval incorrectly defined');
+        }
+        if (!RoomService.isSameDay(startTime, endTime)) {
+            throw new Error('Time interval must be defined on a single day');
+        }
+
+        const slots: RoomSlot[] = [];
         const room = await Room.findByPk(roomId);
         if (!room) {
             throw new Error(`Room ${roomId} not found`);
         }
-        const bookings = await this.bookingService.getSortedBookingsInInterval(roomId, startTime, endTime);
+        const bookings = await this.bookingService.getSortedBookingsInInterval(
+            roomId,
+            startTime,
+            endTime
+        );
 
         // compute closed slots
-        if (room.openingHours > this.getMinutesFromMidnight(startTime)) {
-            const openingHours = this.getDateFromMinutesFromMidnight(room.openingHours);
+        if (room.openingHours > RoomService.getMinutesFromMidnight(startTime)) {
+            const openingHours = RoomService.getDateFromMinutesFromMidnight(
+                startTime,
+                room.openingHours,
+            );
             slots.push({
                 type: 'closed',
                 startTime,
-                endTime: openingHours
+                endTime: openingHours,
             });
+            startTime = openingHours;
         }
-        if (room.closingHours < this.getMinutesFromMidnight(startTime)) {
-            const closingHours = this.getDateFromMinutesFromMidnight(room.closingHours);
+        if (room.closingHours < RoomService.getMinutesFromMidnight(endTime)) {
+            const closingHours = RoomService.getDateFromMinutesFromMidnight(
+                endTime,
+                room.closingHours
+            );
             slots.push({
                 type: 'closed',
                 startTime: closingHours,
-                endTime
+                endTime,
             });
             endTime = closingHours;
         }
@@ -72,13 +104,13 @@ export class RoomService {
                 slots.push({
                     type: 'free',
                     startTime: lastStartTime,
-                    endTime: booking.startTime
-                })
+                    endTime: booking.startTime,
+                });
                 slots.push({
                     type: 'booked',
                     employee: booking.employee,
                     startTime: booking.startTime,
-                    endTime: booking.endTime
+                    endTime: booking.endTime,
                 });
                 lastStartTime = booking.endTime;
             }
@@ -89,58 +121,71 @@ export class RoomService {
                 slots.push({
                     type: 'free',
                     startTime: lastBooking.endTime,
-                    endTime
-                })
+                    endTime,
+                });
             }
         } else {
             slots.push({
                 type: 'free',
                 startTime,
-                endTime
-            })
+                endTime,
+            });
         }
 
         return {
-            slots: slots.sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
+            slots: slots
+                .filter(slot => slot.endTime.getTime() - slot.startTime.getTime() > 1)
+                .sort(
+                    (a, b) => a.startTime.getTime() - b.startTime.getTime()
+                ),
         };
-    }
+    };
 
-    private getMinutesFromMidnight = (date: Date): number => {
+    public static getMinutesFromMidnight = (date: Date): number => {
         const midnight = new Date(date);
-        midnight.setHours(0, 0, 0, 0); // set time to midnight
+        midnight.setUTCHours(0, 0, 0, 0); // set time to midnight
         return (date.getTime() - midnight.getTime()) / (1000 * 60);
-    }
+    };
 
-
-    private getDateFromMinutesFromMidnight = (minutesFromMidnight: number): Date => {
-        const midnight = new Date();
-        midnight.setHours(0, 0, 0, 0); // set time to midnight
+    public static getDateFromMinutesFromMidnight = (
+        date: Date,
+        minutesFromMidnight: number
+    ): Date => {
+        const midnight = new Date(date);
+        midnight.setUTCHours(0, 0, 0, 0); // set time to midnight
         return new Date(midnight.getTime() + minutesFromMidnight * 60 * 1000);
-    }
+    };
 
+    public static isSameDay = (date1: Date, date2: Date): boolean => {
+        return (
+            date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear()
+        );
+    };
 }
 
 export type RoomSchedule = {
     slots: RoomSlot[];
-}
+};
 
 export type RoomSlotFree = {
     type: 'free';
     startTime: Date;
     endTime: Date;
-}
+};
 
 export type RoomSlotClosed = {
     type: 'closed';
     startTime: Date;
     endTime: Date;
-}
+};
 
 export type RoomSlotBooked = {
     type: 'booked';
     employee: Employee;
     startTime: Date;
     endTime: Date;
-}
+};
 
 export type RoomSlot = RoomSlotFree | RoomSlotClosed | RoomSlotBooked;
