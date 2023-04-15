@@ -9,10 +9,8 @@ CREATE TABLE "employees" (
 CREATE TABLE "rooms" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL,
-  "opening_hours" int NOT NULL,
-  -- as minutes from midnight
-  "closing_hours" int NOT NULL,
-  -- as minutes from midnight
+  "opening_hours" int NOT NULL, -- as minutes from midnight
+  "closing_hours" int NOT NULL, -- as minutes from midnight
   "created_at" timestamp NOT NULL,
   "updated_at" timestamp NOT NULL
 );
